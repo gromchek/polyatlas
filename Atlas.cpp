@@ -249,6 +249,8 @@ bool Atlas::VirtualAtlas::drop( const AtlasItem &item, const int index )
         if( size.x + p.x <= maxSize && size.y + p.y <= maxSize )
         {
             itemsPosition[index] = p;
+            atlasSize.x = std::max( atlasSize.x, p.x + item.GetImageSize().x );
+            atlasSize.y = std::max( atlasSize.y, p.y + item.GetImageSize().y );
             return true;
         }
     }
