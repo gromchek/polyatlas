@@ -9,4 +9,6 @@ bool contoursInside( const std::vector<cv::Point> &inner, const std::vector<cv::
 void RDP( const std::vector<cv::Point> &points, const double epsilon, std::vector<cv::Point> &out );
 } // namespace Math
 
+std::string convertToUnixFilepath( std::string str );
+
 #endif // MISC_H

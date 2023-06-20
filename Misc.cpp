@@ -114,3 +114,12 @@ void Math::RDP( const std::vector<cv::Point> &points, const double epsilon, std:
         out.push_back( points[end] );
     }
 }
+
+std::string convertToUnixFilepath( std::string str )
+{
+    auto lastindex = str.find_last_of( "." );
+    str = str.substr( 0, lastindex );
+    std::replace( str.begin(), str.end(), '\\', '/' );
+
+    return str;
+}

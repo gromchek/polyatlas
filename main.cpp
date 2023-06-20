@@ -4,7 +4,9 @@
 #include <algorithm>
 #include "AtlasItem.h"
 #include "Atlas.h"
+#include "Misc.h"
 #include "thrid_party/cxxopts.hpp"
+#include <fstream>
 
 namespace fs = std::filesystem;
 
@@ -35,6 +37,7 @@ int main( int argc, char *argv[] )
     AtlasConfigType configFormat = AtlasConfigType::JSON;
     bool trimAtlasSize = false;
     bool drawDebugLines = false;
+    bool ignoreFiles = false;
     std::string dirPath = ".";
     // clang-format off
     options
@@ -48,6 +51,7 @@ int main( int argc, char *argv[] )
 
     ("trim", "Trim the atlas size", cxxopts::value<bool>(trimAtlasSize)->default_value("false"))
     ("debug", "Draw debug lines on atlas", cxxopts::value<bool>(drawDebugLines)->default_value("false"))
+    ("ignore", "Ignore files from ignore.txt", cxxopts::value<bool>(ignoreFiles)->default_value("false"))
     ("help", "Print help");
     // clang-format on
 
@@ -82,12 +86,31 @@ int main( int argc, char *argv[] )
         return 0;
     }
 
+    std::set<std::string> ignoreList;
+    if( ignoreFiles )
+    {
+        std::string line;
+        std::ifstream file( "ignore.txt" );
+        while( std::getline( file, line ) )
+        {
+            ignoreList.insert( convertToUnixFilepath( line ) );
+        }
+    }
+
     std::vector<AtlasItem> items;
     items.reserve( 128 );
     for( const auto &entry : fs::directory_iterator( dirPath ) )
     {
         if( substringEntryCount( entry.path().string(), ".png" ) == 1 )
         {
+            if( ignoreFiles && !ignoreList.empty() )
+            {
+                const auto &path = convertToUnixFilepath( entry.path().string() );
+                if( ignoreList.find( path ) != ignoreList.end() )
+                {
+                    continue;
+                }
+            }
             items.emplace_back( entry.path().string() );
         }
     }
